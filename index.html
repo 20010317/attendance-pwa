@@ -41,27 +41,46 @@ button{width:100%;padding:14px;margin:6px 0;font-size:16px;border:none;border-ra
 
 
 <script>
-/* ▼▼ ここに Google Apps Script のURLを貼る ▼▼ */
-const ENDPOINT = "https://script.google.com/macros/s/AKfycbwEbQr0XmffTgLI3k6F-NvGLjKnkiV1O5MFLLQRvSrQsjvnehvThSPCvghdOBByb_sIpQ/exec";
+const ENDPOINT = "https://script.google.com/macros/s/AKfycbxjPpw-jDhgNnceH9b4FGMB-Eud9LfG1j5D5jy5_XP27XWvSPL1gtKKFXRZYV0BoC4Xog/exec";
+let lastStatus = "未出勤";
 
-/* 打刻送信処理（完成形） */
+window.onload = () => {
+  fetch(ENDPOINT)
+    .then(r => r.json())
+    .then(data => {
+      lastStatus = data.last;
+      document.getElementById("status").innerText =
+        "前回：" + lastStatus;
+    });
+};
+
 function send(t){
+  if (!canStamp(t)) {
+    alert("その打刻はできません");
+    return;
+  }
+
   fetch(ENDPOINT, {
     method: "POST",
     body: JSON.stringify({ type: t })
-  })
-  .then(() => {
-    document.getElementById("status").innerText =
-      new Date().toLocaleTimeString() + " " + t + " 打刻";
-  })
-  .catch(() => {
-    document.getElementById("status").innerText =
-      "送信エラー（通信失敗）";
+  }).then(() => {
+    lastStatus = t;
+    updateStatus(t);
   });
 }
 
-/* PWA用 Service Worker */
-if ("serviceWorker" in navigator) {
+function canStamp(t){
+  if (lastStatus === "未出勤" && t === "出勤") return true;
+  if (lastStatus === "出勤" && t === "退勤") return true;
+  return false;
+}
+
+function updateStatus(t){
+  document.getElementById("status").innerText =
+    new Date().toLocaleTimeString() + " " + t;
+}
+
+if ("serviceWorker" in navigator") {
   navigator.serviceWorker.register("sw.js");
 }
 </script>
