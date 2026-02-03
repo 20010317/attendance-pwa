@@ -15,7 +15,7 @@ body {
   color:#2C3E50;
 }
 
-/* ヘッダー 上段: 会社情報＋日付 */
+/* ヘッダー 上段: 会社情報 */
 .header-top {
   background:#ECEFF1; /* 淡い灰色 */
   padding:10px 20px;
@@ -24,9 +24,8 @@ body {
 }
 .header-company { font-size:22px; font-weight:700; margin-bottom:2px; color:#2C3E50; }
 .header-employee { font-size:16px; margin-bottom:4px; color:#2C3E50; }
-.header-date { font-size:18px; font-weight:500; color:#2C3E50; }
 
-/* ヘッダー 下段: デジタル時計＋直前打刻 */
+/* ヘッダー 下段: デジタル時計＋年月日＋直前打刻 */
 .header-bottom {
   background:#003366; /* ディープブルー */
   color:white; border-radius:0 0 12px 12px;
@@ -36,6 +35,7 @@ body {
 }
 .header-clock { font-family:'Orbitron','Courier New',monospace; font-size:48px; letter-spacing:2px; line-height:1; }
 .header-clock span.sec { font-size:28px; }
+.header-date { font-size:18px; font-weight:500; margin-bottom:8px; } /* 時計の上に表示 */
 .header-last { font-size:14px; margin-top:8px; display:flex; align-items:center; gap:10px; }
 .header-last button { background:#E74C3C; color:white; border:none; border-radius:8px; padding:4px 8px; cursor:pointer; font-size:12px; transition:0.15s; }
 .header-last button:active { transform:scale(0.95); }
@@ -76,6 +76,7 @@ button.action-btn:active { transform:scale(0.97); }
 /* 勤務状況サマリー */
 .summary-card {
   background:#F0F0F0; border-radius:12px; padding:15px; display:flex; flex-direction:column; gap:10px;
+  margin-bottom:0; /* 下の余白を削除 */
 }
 .summary-title { font-weight:500; font-size:16px; margin-bottom:5px; }
 .summary-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(100px,1fr)); gap:10px; }
@@ -115,14 +116,15 @@ button.action-btn:active { transform:scale(0.97); }
 </head>
 <body>
 
-<!-- ヘッダー -->
+<!-- ヘッダー 上段: 会社情報 -->
 <div class="header-top">
-  <div class="header-company" id="companyName">アビームコンサルティング株式会社</div>
-  <div class="header-employee" id="employeeInfo">宮嵜 凌 / 社員番号:12185</div>
-  <div class="header-date" id="dateDisplay">----/--/-- (---)</div>
+  <div class="header-company" id="companyName">株式会社サンプル</div>
+  <div class="header-employee" id="employeeInfo">山田 太郎 / 社員番号:12345</div>
 </div>
 
+<!-- ヘッダー 下段: デジタル時計＋年月日＋直前打刻 -->
 <div class="header-bottom">
+  <div class="header-date" id="dateDisplay">----/--/-- (---)</div>
   <div class="header-clock" id="digitalClock">--:--<span class="sec">--</span></div>
   <div class="header-last">
     <span id="lastStamp">直前の打刻：[勤務開始] ----/-- --:--</span>
