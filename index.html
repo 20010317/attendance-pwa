@@ -13,9 +13,11 @@ body { font-family: 'Roboto', sans-serif; background: #ECF0F1; margin:0; padding
   background: linear-gradient(135deg,#2C3E50,#34495E);
   color:white; border-radius:15px; padding:15px; margin-bottom:15px; text-align:center;
   box-shadow:0 6px 12px rgba(0,0,0,0.15);
+  position:relative; /* 時計を右上に配置するため */
 }
 .header-card h1 {margin:0; font-size:22px; font-weight:700;}
 .header-card p {margin:5px 0 0 0; font-size:16px; font-weight:500;}
+#currentTime { position:absolute; top:15px; right:15px; font-size:14px; color:#AED6F1; font-weight:500; }
 
 /* ボタン */
 .button-grid { display:grid; grid-template-columns: repeat(2, 1fr); gap:15px; margin-bottom:20px; }
@@ -56,6 +58,7 @@ button:active { transform: scale(0.95); filter: brightness(1.1); box-shadow:0 2p
 <div class="header-card">
   <h1>株式会社サンプル</h1>
   <p>山田 太郎 / 社員番号: 12345</p>
+  <div id="currentTime">--:--:--</div>
 </div>
 
 <div class="button-grid">
@@ -89,12 +92,14 @@ button:active { transform: scale(0.95); filter: brightness(1.1); box-shadow:0 2p
 <script>
 const WEBAPP_URL = '【ここにWebアプリURL】';
 
+// トースト表示
 function showToast(msg){
   const toast = document.getElementById('toast');
   toast.innerText = msg; toast.style.opacity = 1;
   setTimeout(()=>{ toast.style.opacity=0; }, 1500);
 }
 
+// 打刻ボタン押下
 function post(type){
   fetch(WEBAPP_URL, { method:'POST', body: JSON.stringify({type:type}) })
   .then(r=>r.json()).then(d=>{
@@ -103,6 +108,7 @@ function post(type){
   }).catch(e=>{ showToast('通信エラー'); });
 }
 
+// 勤務状況読み込み
 function loadStatus(){
   fetch(WEBAPP_URL+'?type=status')
   .then(r=>r.json()).then(d=>{
@@ -124,6 +130,18 @@ function loadStatus(){
   });
 }
 
+// リアルタイム時計
+function updateClock() {
+  const now = new Date();
+  const timeString = now.getHours().toString().padStart(2,'0') + ':' +
+                     now.getMinutes().toString().padStart(2,'0') + ':' +
+                     now.getSeconds().toString().padStart(2,'0');
+  document.getElementById('currentTime').innerText = timeString;
+}
+setInterval(updateClock, 1000);
+updateClock();
+
+// グラフ描画
 google.charts.load('current', {'packages':['corechart']});
 function drawChart(d){
   var data = google.visualization.arrayToDataTable([
@@ -139,8 +157,10 @@ function drawChart(d){
 }
 google.charts.setOnLoadCallback(loadStatus);
 
+// PWAサービスワーカー登録
 if('serviceWorker' in navigator){ navigator.serviceWorker.register('service-worker.js'); }
 
+// ホーム画面追加ボタン
 let deferredPrompt;
 window.addEventListener('beforeinstallprompt', e=>{
   e.preventDefault(); deferredPrompt=e;
