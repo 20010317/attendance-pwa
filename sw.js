@@ -1,13 +1,8 @@
-self.addEventListener("install",e=>self.skipWaiting());
-self.addEventListener("fetch",e=>e.respondWith(fetch(e.request)));
+const CACHE_NAME = 'kintai-app-cache-v1';
+const urlsToCache = [
+  './index.html','./manifest.json','./icons/icon-192.png','./icons/icon-512.png',
+  'https://www.gstatic.com/charts/loader.js'
+];
 
-let currentStatus = "未出勤";
-
-function updateStatus(t){
-  const time = new Date().toLocaleTimeString();
-  document.getElementById("status").innerText = time+" "+t;
-
-  const li = document.createElement("li");
-  li.innerText = time+" "+t;
-  document.getElementById("log").appendChild(li);
-}
+self.addEventListener('install', e=>{ e.waitUntil(caches.open(CACHE_NAME).then(c=>c.addAll(urlsToCache))); });
+self.addEventListener('fetch', e=>{ e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request))); });
