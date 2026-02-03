@@ -1,103 +1,135 @@
-<details>
-<summary>▶ index.html（タップで開く）</summary>
-
-  <!DOCTYPE html>
-<html lang="ja">
+<!DOCTYPE html>
+<html>
 <head>
-<meta charset="UTF-8">
-<title>勤怠管理システム</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#0f4c81">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>勤怠管理アプリ</title>
+<script src="https://www.gstatic.com/charts/loader.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
-body{margin:0;font-family:-apple-system,system-ui;background:#f2f4f7}
-header{background:#0f4c81;color:#fff;padding:16px}
-main{padding:16px}
-.card{background:#fff;padding:16px;border-radius:8px;margin-bottom:16px}
-button{width:100%;padding:14px;margin:6px 0;font-size:16px;border:none;border-radius:6px;background:#1976d2;color:#fff}
-.sub{background:#607d8b}
+body { font-family: 'Roboto', sans-serif; background: #f0f2f5; margin:0; padding:10px; }
+
+/* ヘッダー */
+.header-card {
+  background: linear-gradient(135deg,#2196F3,#64B5F6);
+  color:white; border-radius:15px; padding:15px; margin-bottom:15px; text-align:center;
+  box-shadow:0 6px 12px rgba(0,0,0,0.1);
+}
+.header-card h1 {margin:0; font-size:22px; font-weight:700;}
+.header-card p {margin:5px 0 0 0; font-size:16px; font-weight:500;}
+
+/* ボタン */
+.button-grid { display:grid; grid-template-columns: repeat(2, 1fr); gap:15px; margin-bottom:20px; }
+button { font-size:18px; font-weight:500; padding:20px; border:none; border-radius:50px; color:white; cursor:pointer;
+         transition: transform 0.15s, filter 0.15s, box-shadow 0.2s; box-shadow:0 4px 6px rgba(0,0,0,0.15);}
+button:active { transform: scale(0.95); filter: brightness(1.1); box-shadow:0 2px 3px rgba(0,0,0,0.2);}
+.green {background: linear-gradient(135deg,#4CAF50,#81C784);}
+.red {background: linear-gradient(135deg,#F44336,#E57373);}
+.orange {background: linear-gradient(135deg,#FF9800,#FFB74D);}
+.blue {background: linear-gradient(135deg,#2196F3,#64B5F6);}
+
+/* カード */
+.card { background:white; border-radius:15px; padding:20px; margin:10px 0;
+        box-shadow:0 6px 12px rgba(0,0,0,0.08); opacity:0; transform:translateY(15px);
+        transition: all 0.5s ease;}
+.card.visible {opacity:1; transform:translateY(0);}
+.status p {margin:6px 0; font-size:16px; line-height:1.4;}
+
+/* トースト */
+#toast { position: fixed; bottom:20px; left:50%; transform:translateX(-50%);
+        background: rgba(0,0,0,0.75); color:white; padding:12px 25px; border-radius:25px;
+        opacity:0; transition: opacity 0.4s; font-weight:500;}
 </style>
 </head>
 <body>
-<header>
-<strong>アビームコンサルティング株式会社</strong><br>
-<small>勤怠管理システム</small>
-</header>
-<main>
-<div class="card">
-<button onclick="send('出勤')">出勤</button>
-<button onclick="send('退勤')">退勤</button>
-<button class="sub" onclick="send('外出')">外出</button>
-<button class="sub" onclick="send('戻り')">戻り</button>
-</div>
-<div class="card">
-ステータス：<span id="status">未送信</span>
-</div>
-  <div class="card">
-<strong>本日の打刻</strong>
-<ul id="log"></ul>
-</div>
-</main>
 
+<div class="header-card">
+  <h1>株式会社サンプル</h1>
+  <p>山田 太郎 / 社員番号: 12345</p>
+</div>
+
+<div class="button-grid">
+  <button class="green" onclick="post('出勤')">🟢 出勤</button>
+  <button class="red" onclick="post('退勤')">🔴 退勤</button>
+  <button class="orange" onclick="post('外出')">🟠 外出</button>
+  <button class="blue" onclick="post('戻り')">🔵 戻り</button>
+</div>
+
+<div class="card status" id="todayCard">
+<h3>今日の勤務状況</h3>
+<p id="todayStatus">読み込み中...</p>
+</div>
+
+<div class="card status" id="monthCard">
+<h3>月次サマリー</h3>
+<p id="monthSummary">読み込み中...</p>
+</div>
+
+<div class="card" id="chartCard">
+<div id="chart_div" style="width:100%; height:300px;"></div>
+</div>
+
+<div id="toast"></div>
 
 <script>
-const ENDPOINT = "https://script.google.com/macros/s/AKfycbxuLIrrGCstqtI7dur3vcFcbaUNP5GI4Q0QpTSfLWD8ymQScbe_JYfSkBt7rXMxcpf6FQ/exec";
-let lastStatus = "未出勤";
+const WEBAPP_URL = '【ここにWebアプリURL】';
 
-/* 起動時に最後の打刻状態を取得 */
-window.onload = () => {
-  fetch(ENDPOINT)
-    .then(r => r.json())
-    .then(data => {
-      lastStatus = data.last;
-      document.getElementById("status").innerText =
-        "前回：" + lastStatus;
-    })
-    .catch(() => {
-      document.getElementById("status").innerText =
-        "状態取得失敗";
-    });
-};
+function showToast(msg){
+  const toast = document.getElementById('toast');
+  toast.innerText = msg; toast.style.opacity = 1;
+  setTimeout(()=>{ toast.style.opacity=0; }, 1500);
+}
 
-/* 打刻処理 */
-function send(t){
-  if (!canStamp(t)) {
-    alert("その打刻はできません");
-    return;
-  }
+function post(type){
+  fetch(WEBAPP_URL, { method:'POST', body: JSON.stringify({type:type}) })
+  .then(r=>r.json()).then(d=>{ showToast(d.status+(d.message?': '+d.message:'')); loadStatus(); })
+  .catch(e=>{ showToast('通信エラー'); });
+}
 
-  fetch(ENDPOINT, {
-    method: "POST",
-    body: JSON.stringify({ type: t })
-  })
-  .then(() => {
-    lastStatus = t;
-    updateStatus(t);
-  })
-  .catch(() => {
-    alert("通信エラー");
+function loadStatus(){
+  fetch(WEBAPP_URL+'?type=status')
+  .then(r=>r.json()).then(d=>{
+    const todayText =
+      `出勤: ${d.checkIn}\n退勤: ${d.checkOut}\n実労働: ${d.work}\n残業: ${d.overtime}\n外出: ${d.break}\n深夜: ${d.midnight}`;
+    document.getElementById('todayStatus').innerText = todayText;
+    document.getElementById('todayCard').classList.add('visible');
+
+    const monthText =
+      `出勤日数: ${d.days}\n労働合計: ${d.totalWork}\n残業合計: ${d.totalOvertime}\n深夜合計: ${d.totalMidnight}\n外出合計: ${d.totalBreak}`;
+    document.getElementById('monthSummary').innerText = monthText;
+    document.getElementById('monthCard').classList.add('visible');
+
+    drawChart(d);
   });
 }
 
-/* 二重打刻判定 */
-function canStamp(t){
-  if (lastStatus === "未出勤" && t === "出勤") return true;
-  if (lastStatus === "出勤" && t === "退勤") return true;
-  return false;
+google.charts.load('current', {'packages':['corechart']});
+function drawChart(d){
+  var data = google.visualization.arrayToDataTable([
+    ['項目','時間',{ role: 'style' }],
+    ['労働', d.work||0, 'color:rgba(76,175,80,0.8)'],
+    ['残業', d.overtime||0, 'color:rgba(244,67,54,0.8)'],
+    ['深夜', d.midnight||0, 'color:rgba(33,150,243,0.8)'],
+    ['外出', d.break||0, 'color:rgba(255,152,0,0.8)']
+  ]);
+  var options = { title:'月次勤怠グラフ', legend:{position:'bottom'}, animation:{startup:true,duration:600,easing:'out'}};
+  var chart = new google.visualization.ColumnChart(document.getElementById('chart_div'));
+  chart.draw(data, options);
 }
+google.charts.setOnLoadCallback(loadStatus);
 
-/* 画面更新 */
-function updateStatus(t){
-  document.getElementById("status").innerText =
-    new Date().toLocaleTimeString() + " " + t;
-}
+if('serviceWorker' in navigator){ navigator.serviceWorker.register('service-worker.js'); }
 
-/* PWA */
-if ("serviceWorker" in navigator) {
-  navigator.serviceWorker.register("sw.js");
-}
+let deferredPrompt;
+window.addEventListener('beforeinstallprompt', e=>{
+  e.preventDefault(); deferredPrompt=e;
+  const btn=document.createElement('button');
+  btn.innerText="ホーム画面に追加";
+  btn.style.position="fixed"; btn.style.bottom="20px"; btn.style.left="50%"; btn.style.transform="translateX(-50%)";
+  btn.style.padding="12px 20px"; btn.style.borderRadius="20px"; btn.style.background="#2196F3"; btn.style.color="white";
+  btn.style.fontWeight="500"; btn.style.zIndex="1000";
+  btn.onclick=()=>{ deferredPrompt.prompt(); deferredPrompt.userChoice.then(()=>{ deferredPrompt=null; btn.remove(); }); };
+  document.body.appendChild(btn);
+});
 </script>
 </body>
 </html>
-
-</details>
