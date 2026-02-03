@@ -15,17 +15,25 @@ body {
   color:#2C3E50;
 }
 
-/* ヘッダー */
-.header {
+/* ヘッダー 上段: 会社情報＋日付 */
+.header-top {
+  background:#ECEFF1; /* 淡い灰色 */
+  padding:10px 20px;
+  display:flex; flex-direction:column; align-items:flex-start;
+  border-bottom:1px solid #B0BEC5;
+}
+.header-company { font-size:22px; font-weight:700; margin-bottom:2px; color:#2C3E50; }
+.header-employee { font-size:16px; margin-bottom:4px; color:#2C3E50; }
+.header-date { font-size:18px; font-weight:500; color:#2C3E50; }
+
+/* ヘッダー 下段: デジタル時計＋直前打刻 */
+.header-bottom {
   background:#003366; /* ディープブルー */
   color:white; border-radius:0 0 12px 12px;
   padding:15px 20px;
   box-shadow:0 4px 12px rgba(0,0,0,0.15);
   display:flex; flex-direction:column; align-items:flex-start;
 }
-.header-company { font-size:22px; font-weight:700; margin-bottom:4px; }
-.header-employee { font-size:16px; margin-bottom:8px; }
-.header-date { font-size:18px; margin-bottom:8px; font-weight:500; }
 .header-clock { font-family:'Orbitron','Courier New',monospace; font-size:48px; letter-spacing:2px; line-height:1; }
 .header-clock span.sec { font-size:28px; }
 .header-last { font-size:14px; margin-top:8px; display:flex; align-items:center; gap:10px; }
@@ -47,12 +55,12 @@ button.action-btn {
 button.action-btn:active { transform:scale(0.97); }
 
 /* 色分け */
-.btn-start { background:#003366; color:white; }       /* 勤務開始 */
-.btn-end   { background:#003366; color:white; }       /* 勤務終了 */
-.btn-break { background:white; color:#003366; border:2px solid #003366; }  /* 休憩開始 */
-.btn-return{ background:white; color:#003366; border:2px solid #003366; }  /* 休憩終了 */
-.btn-out   { background:white; color:#003366; border:2px solid #003366; }  /* 外出 */
-.btn-back  { background:white; color:#003366; border:2px solid #003366; }  /* 戻り */
+.btn-start { background:#003366; color:white; }       
+.btn-end   { background:#003366; color:white; }       
+.btn-break { background:white; color:#003366; border:2px solid #003366; }  
+.btn-return{ background:white; color:#003366; border:2px solid #003366; }  
+.btn-out   { background:white; color:#003366; border:2px solid #003366; }  
+.btn-back  { background:white; color:#003366; border:2px solid #003366; }  
 
 /* 入力・情報エリア */
 .info-section {
@@ -101,16 +109,20 @@ button.action-btn:active { transform:scale(0.97); }
   .summary-field { font-size:12px; }
   .header-company { font-size:18px; }
   .header-employee { font-size:14px; }
+  .header-date { font-size:16px; }
 }
 </style>
 </head>
 <body>
 
 <!-- ヘッダー -->
-<div class="header">
-  <div class="header-company" id="companyName">アビームコンサルティング株式会社</div>
-  <div class="header-employee" id="employeeInfo">宮嵜 凌 / 社員番号:16781</div>
+<div class="header-top">
+  <div class="header-company" id="companyName">株式会社サンプル</div>
+  <div class="header-employee" id="employeeInfo">山田 太郎 / 社員番号:12345</div>
   <div class="header-date" id="dateDisplay">----/--/-- (---)</div>
+</div>
+
+<div class="header-bottom">
   <div class="header-clock" id="digitalClock">--:--<span class="sec">--</span></div>
   <div class="header-last">
     <span id="lastStamp">直前の打刻：[勤務開始] ----/-- --:--</span>
@@ -164,7 +176,6 @@ function showToast(msg){
   setTimeout(()=>{ toast.style.opacity=0; },1500);
 }
 
-// 打刻送信
 function post(type){
   fetch(WEBAPP_URL, { method:'POST', body: JSON.stringify({type:type}) })
   .then(r=>r.json()).then(d=>{
@@ -173,7 +184,6 @@ function post(type){
   }).catch(()=>showToast('通信エラー'));
 }
 
-// 打刻取消
 function cancelLast(){
   fetch(WEBAPP_URL+'?type=cancel', { method:'POST' })
   .then(r=>r.json()).then(d=>{
@@ -182,7 +192,6 @@ function cancelLast(){
   }).catch(()=>showToast('通信エラー'));
 }
 
-// 勤務状況読み込み
 function loadStatus(){
   fetch(WEBAPP_URL+'?type=status')
   .then(r=>r.json()).then(d=>{
@@ -198,7 +207,6 @@ function loadStatus(){
   });
 }
 
-// デジタル時計
 function updateDateTime(){
   const now=new Date();
   const year=now.getFullYear();
@@ -216,7 +224,6 @@ function updateDateTime(){
 setInterval(updateDateTime,1000);
 updateDateTime();
 
-// グラフ
 google.charts.load('current', {'packages':['corechart']});
 function drawChart(d){
   const data=google.visualization.arrayToDataTable([
