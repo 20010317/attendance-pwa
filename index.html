@@ -8,7 +8,7 @@
 <style>
 body { 
   font-family: 'Roboto', sans-serif; 
-  background: #F0F0F0; /* ページ全体を淡い灰色に */
+  background: #F0F0F0; 
   margin:0; 
   padding:10px 0 60px 0;
 }
@@ -32,20 +32,21 @@ button:active { transform: scale(0.95); filter: brightness(1.1); box-shadow:0 2p
 .orange{background: linear-gradient(135deg,#4A6073,#627D8D);}
 .blue  {background: linear-gradient(135deg,#5D6D7E,#7F8C97);}
 
-/* 年月日＋デジタル時計カード */
+/* 年月日＋曜日＋デジタル時計カード */
 #clockCard {
-  background: #000000; /* 黒背景 */
+  background: #000000; 
   border-radius: 15px;
   padding: 15px 10px;
   margin: 0 10px 15px 10px;
   box-shadow: 0 4px 12px rgba(0,0,0,0.3);
   text-align: center;
+  overflow: hidden; /* はみ出し防止 */
 }
 
-/* 年月日 */
+/* 年月日＋曜日 */
 #dateDisplay {
-  font-size:20px;
-  color:#00FF00; /* 緑文字 */
+  font-size:18px; /* 少し小さめに調整 */
+  color:#00FF00;
   margin-bottom:5px;
   font-weight:500;
 }
@@ -53,12 +54,13 @@ button:active { transform: scale(0.95); filter: brightness(1.1); box-shadow:0 2p
 /* デジタル時計 */
 #digitalClock {
   font-family: 'Orbitron', 'Courier New', monospace;
-  font-size:72px;
+  font-size:48px; /* 小さくしてはみ出さない */
   color:#00FF00;
-  letter-spacing:4px;
+  letter-spacing:3px;
   margin:0;
   width:100%;
-  overflow:hidden; /* 横幅からはみ出さない */
+  overflow:hidden;
+  word-break: break-word;
 }
 
 /* カード */
@@ -99,9 +101,9 @@ button:active { transform: scale(0.95); filter: brightness(1.1); box-shadow:0 2p
   <button class="blue" onclick="post('戻り')">🔵 戻り</button>
 </div>
 
-<!-- 年月日＋デジタル時計カード -->
+<!-- 年月日＋曜日＋デジタル時計カード -->
 <div id="clockCard">
-  <div id="dateDisplay">----/--/--</div>
+  <div id="dateDisplay">----/--/-- (---)</div>
   <div id="digitalClock">--:--:--</div>
 </div>
 
@@ -165,13 +167,15 @@ function loadStatus(){
   });
 }
 
-// 年月日と時計更新
+// 年月日＋曜日と時計更新
 function updateDateTime() {
   const now = new Date();
   const year = now.getFullYear();
   const month = (now.getMonth()+1).toString().padStart(2,'0');
   const day = now.getDate().toString().padStart(2,'0');
-  document.getElementById('dateDisplay').innerText = `${year}/${month}/${day}`;
+  const weekdays = ['日','月','火','水','木','金','土'];
+  const weekday = weekdays[now.getDay()];
+  document.getElementById('dateDisplay').innerText = `${year}/${month}/${day} (${weekday})`;
 
   const timeString = now.getHours().toString().padStart(2,'0') + ':' +
                      now.getMinutes().toString().padStart(2,'0') + ':' +
