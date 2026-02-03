@@ -13,11 +13,10 @@ body { font-family: 'Roboto', sans-serif; background: #ECF0F1; margin:0; padding
   background: linear-gradient(135deg,#2C3E50,#34495E);
   color:white; border-radius:15px; padding:15px; margin-bottom:15px; text-align:center;
   box-shadow:0 6px 12px rgba(0,0,0,0.15);
-  position:relative; /* 時計を右上に配置するため */
+  position:relative;
 }
 .header-card h1 {margin:0; font-size:22px; font-weight:700;}
 .header-card p {margin:5px 0 0 0; font-size:16px; font-weight:500;}
-#currentTime { position:absolute; top:15px; right:15px; font-size:14px; color:#AED6F1; font-weight:500; }
 
 /* ボタン */
 .button-grid { display:grid; grid-template-columns: repeat(2, 1fr); gap:15px; margin-bottom:20px; }
@@ -35,6 +34,19 @@ button:active { transform: scale(0.95); filter: brightness(1.1); box-shadow:0 2p
         transition: all 0.5s ease;}
 .card.visible {opacity:1; transform:translateY(0);}
 .status p {margin:6px 0; font-size:16px; line-height:1.4; color:#2C3E50;}
+
+/* デジタル時計 */
+#digitalClock {
+  text-align:center;
+  font-family: 'Courier New', monospace;
+  font-size:48px;
+  color:#AED6F1;
+  background: rgba(44,62,80,0.1);
+  border-radius:15px;
+  padding:15px 0;
+  margin:15px 10px;
+  box-shadow:0 4px 8px rgba(0,0,0,0.1);
+}
 
 /* トースト */
 #toast { position: fixed; bottom:70px; left:50%; transform:translateX(-50%);
@@ -58,7 +70,6 @@ button:active { transform: scale(0.95); filter: brightness(1.1); box-shadow:0 2p
 <div class="header-card">
   <h1>株式会社サンプル</h1>
   <p>山田 太郎 / 社員番号: 12345</p>
-  <div id="currentTime">--:--:--</div>
 </div>
 
 <div class="button-grid">
@@ -67,6 +78,9 @@ button:active { transform: scale(0.95); filter: brightness(1.1); box-shadow:0 2p
   <button class="orange" onclick="post('外出')">🟠 外出</button>
   <button class="blue" onclick="post('戻り')">🔵 戻り</button>
 </div>
+
+<!-- デジタル時計表示（画面中央） -->
+<div id="digitalClock">--:--:--</div>
 
 <div class="card status" id="todayCard">
 <h3>今日の勤務状況</h3>
@@ -130,16 +144,16 @@ function loadStatus(){
   });
 }
 
-// リアルタイム時計
-function updateClock() {
+// デジタル時計更新
+function updateDigitalClock() {
   const now = new Date();
   const timeString = now.getHours().toString().padStart(2,'0') + ':' +
                      now.getMinutes().toString().padStart(2,'0') + ':' +
                      now.getSeconds().toString().padStart(2,'0');
-  document.getElementById('currentTime').innerText = timeString;
+  document.getElementById('digitalClock').innerText = timeString;
 }
-setInterval(updateClock, 1000);
-updateClock();
+setInterval(updateDigitalClock, 1000);
+updateDigitalClock();
 
 // グラフ描画
 google.charts.load('current', {'packages':['corechart']});
