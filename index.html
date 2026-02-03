@@ -6,19 +6,23 @@
 <script src="https://www.gstatic.com/charts/loader.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Orbitron:wght@500;700&display=swap" rel="stylesheet">
 <style>
-body { font-family: 'Roboto', sans-serif; background: #ECF0F1; margin:0; padding:10px 0 60px 0; }
+body { 
+  font-family: 'Roboto', sans-serif; 
+  background: #F0F0F0; /* ページ全体を淡い灰色に */
+  margin:0; 
+  padding:10px 0 60px 0;
+}
 
 /* ヘッダー */
 .header-card {
   background: linear-gradient(135deg,#2C3E50,#34495E);
   color:white; border-radius:15px; padding:15px; margin-bottom:15px; text-align:center;
   box-shadow:0 6px 12px rgba(0,0,0,0.15);
-  position:relative;
 }
 .header-card h1 {margin:0; font-size:22px; font-weight:700;}
 .header-card p {margin:5px 0 0 0; font-size:16px; font-weight:500;}
 
-/* ボタン */
+/* 打刻ボタン */
 .button-grid { display:grid; grid-template-columns: repeat(2, 1fr); gap:15px; margin-bottom:20px; }
 button { font-size:18px; font-weight:500; padding:20px; border:none; border-radius:50px; color:white; cursor:pointer;
          transition: transform 0.15s, filter 0.15s, box-shadow 0.2s; box-shadow:0 4px 6px rgba(0,0,0,0.15);}
@@ -28,35 +32,41 @@ button:active { transform: scale(0.95); filter: brightness(1.1); box-shadow:0 2p
 .orange{background: linear-gradient(135deg,#4A6073,#627D8D);}
 .blue  {background: linear-gradient(135deg,#5D6D7E,#7F8C97);}
 
+/* 年月日＋デジタル時計カード */
+#clockCard {
+  background: #000000; /* 黒背景 */
+  border-radius: 15px;
+  padding: 15px 10px;
+  margin: 0 10px 15px 10px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  text-align: center;
+}
+
+/* 年月日 */
+#dateDisplay {
+  font-size:20px;
+  color:#00FF00; /* 緑文字 */
+  margin-bottom:5px;
+  font-weight:500;
+}
+
+/* デジタル時計 */
+#digitalClock {
+  font-family: 'Orbitron', 'Courier New', monospace;
+  font-size:72px;
+  color:#00FF00;
+  letter-spacing:4px;
+  margin:0;
+  width:100%;
+  overflow:hidden; /* 横幅からはみ出さない */
+}
+
 /* カード */
 .card { background:white; border-radius:15px; padding:20px; margin:10px 10px;
         box-shadow:0 6px 12px rgba(44,62,80,0.08); opacity:0; transform:translateY(15px);
         transition: all 0.5s ease;}
 .card.visible {opacity:1; transform:translateY(0);}
 .status p {margin:6px 0; font-size:16px; line-height:1.4; color:#2C3E50;}
-
-/* 年月日 */
-#dateDisplay {
-  text-align:center;
-  font-size:20px;
-  color:#2C3E50;
-  margin:0 10px 5px 10px;
-  font-weight:500;
-}
-
-/* デジタル時計 */
-#digitalClock {
-  text-align:center;
-  font-family: 'Orbitron', 'Courier New', monospace;
-  font-size:72px; /* 大きめ */
-  color: #00FF00;
-  background: #000000;
-  border-radius: 10px;
-  padding: 20px 0;
-  margin: 0 10px 15px 10px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-  letter-spacing: 4px;
-}
 
 /* トースト */
 #toast { position: fixed; bottom:70px; left:50%; transform:translateX(-50%);
@@ -89,11 +99,11 @@ button:active { transform: scale(0.95); filter: brightness(1.1); box-shadow:0 2p
   <button class="blue" onclick="post('戻り')">🔵 戻り</button>
 </div>
 
-<!-- 年月日 -->
-<div id="dateDisplay">----/--/--</div>
-
-<!-- デジタル時計 -->
-<div id="digitalClock">--:--:--</div>
+<!-- 年月日＋デジタル時計カード -->
+<div id="clockCard">
+  <div id="dateDisplay">----/--/--</div>
+  <div id="digitalClock">--:--:--</div>
+</div>
 
 <div class="card status" id="todayCard">
 <h3>今日の勤務状況</h3>
@@ -150,7 +160,6 @@ function loadStatus(){
 
     drawChart(d);
 
-    // 下部ステータスバー更新
     document.getElementById('footerStatus').innerText =
       `勤務 ${d.work || 0}h | 残業 ${d.overtime || 0}h | 外出 ${d.break || 0}h`;
   });
