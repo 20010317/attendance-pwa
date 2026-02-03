@@ -1,0 +1,46 @@
+<details>
+<summary>▶ index.html（タップで開く）</summary>
+
+  <!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>勤怠管理システム</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0f4c81">
+<style>
+body{margin:0;font-family:-apple-system,system-ui;background:#f2f4f7}
+header{background:#0f4c81;color:#fff;padding:16px}
+main{padding:16px}
+.card{background:#fff;padding:16px;border-radius:8px;margin-bottom:16px}
+button{width:100%;padding:14px;margin:6px 0;font-size:16px;border:none;border-radius:6px;background:#1976d2;color:#fff}
+.sub{background:#607d8b}
+</style>
+</head>
+<body>
+<header>
+<strong>アビームコンサルティング株式会社</strong><br>
+<small>勤怠管理システム</small>
+</header>
+<main>
+<div class="card">
+<button onclick="send('出勤')">出勤</button>
+<button onclick="send('退勤')">退勤</button>
+<button class="sub" onclick="send('外出')">外出</button>
+<button class="sub" onclick="send('戻り')">戻り</button>
+</div>
+<div class="card">
+ステータス：<span id="status">未送信</span>
+</div>
+</main>
+<script>
+function send(t){
+document.getElementById("status").innerText=new Date().toLocaleTimeString()+" "+t;
+}
+if("serviceWorker"in navigator){navigator.serviceWorker.register("sw.js")}
+</script>
+</body>
+</html>
+
+</details>
