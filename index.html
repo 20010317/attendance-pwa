@@ -35,10 +35,31 @@ button{width:100%;padding:14px;margin:6px 0;font-size:16px;border:none;border-ra
 </div>
 </main>
 <script>
+
+<script>
+/* ▼▼ ここに Google Apps Script のURLを貼る ▼▼ */
+const ENDPOINT = "https://script.google.com/macros/s/AKfycbw7H_Tct0Y2w-dzYpw6TcRrRvRwGArK089mTNzVZyVTQi7ebMlVk5-kr3r5JXWHGSIZjA/exec";
+
+/* 打刻送信処理（完成形） */
 function send(t){
-document.getElementById("status").innerText=new Date().toLocaleTimeString()+" "+t;
+  fetch(ENDPOINT, {
+    method: "POST",
+    body: JSON.stringify({ type: t })
+  })
+  .then(() => {
+    document.getElementById("status").innerText =
+      new Date().toLocaleTimeString() + " " + t + " 打刻";
+  })
+  .catch(() => {
+    document.getElementById("status").innerText =
+      "送信エラー（通信失敗）";
+  });
 }
-if("serviceWorker"in navigator){navigator.serviceWorker.register("sw.js")}
+
+/* PWA用 Service Worker */
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.register("sw.js");
+}
 </script>
 </body>
 </html>
