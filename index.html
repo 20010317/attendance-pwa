@@ -41,9 +41,10 @@ button{width:100%;padding:14px;margin:6px 0;font-size:16px;border:none;border-ra
 
 
 <script>
-const ENDPOINT = "https://script.google.com/macros/s/AKfycbxjPpw-jDhgNnceH9b4FGMB-Eud9LfG1j5D5jy5_XP27XWvSPL1gtKKFXRZYV0BoC4Xog/exec";
+const ENDPOINT = "https://script.googleusercontent.com/macros/echo?user_content_key=AehSKLhB3BHJk-y_X3iNMn82qTJVKnOacftVybhy1CHHJ9Nq5pO9qe_G1EC6OjdUUzksmmw0YIlrryH0tgqt2wfGU8cisAw_bGZNCwOaUuLL-DW6Q_HHg_AKybZxnWDAjGo43DZEzTYkN5sq_i4P5CAx6edHNyc3HdZVHQQGbsyFB__2oIOdkxwtnjWq43JFL7eRkMcU-R41C67lMzPI8qih2RLh6sbNNvo4TlEBJrQRbBN8H8YWa_sfL0k2GwuopXA6io7Wh3VXLuqsLO7GhBWZ0plXaOPjW6xo2no7y2ON&lib=MHMV7NKihZAi_G7nGaJFjYMy9Wt-MSdR8";
 let lastStatus = "未出勤";
 
+/* 起動時に最後の打刻状態を取得 */
 window.onload = () => {
   fetch(ENDPOINT)
     .then(r => r.json())
@@ -51,9 +52,14 @@ window.onload = () => {
       lastStatus = data.last;
       document.getElementById("status").innerText =
         "前回：" + lastStatus;
+    })
+    .catch(() => {
+      document.getElementById("status").innerText =
+        "状態取得失敗";
     });
 };
 
+/* 打刻処理 */
 function send(t){
   if (!canStamp(t)) {
     alert("その打刻はできません");
@@ -63,23 +69,30 @@ function send(t){
   fetch(ENDPOINT, {
     method: "POST",
     body: JSON.stringify({ type: t })
-  }).then(() => {
+  })
+  .then(() => {
     lastStatus = t;
     updateStatus(t);
+  })
+  .catch(() => {
+    alert("通信エラー");
   });
 }
 
+/* 二重打刻判定 */
 function canStamp(t){
   if (lastStatus === "未出勤" && t === "出勤") return true;
   if (lastStatus === "出勤" && t === "退勤") return true;
   return false;
 }
 
+/* 画面更新 */
 function updateStatus(t){
   document.getElementById("status").innerText =
     new Date().toLocaleTimeString() + " " + t;
 }
 
+/* PWA */
 if ("serviceWorker" in navigator) {
   navigator.serviceWorker.register("sw.js");
 }
