@@ -6,13 +6,13 @@
 <script src="https://www.gstatic.com/charts/loader.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
-body { font-family: 'Roboto', sans-serif; background: #f0f2f5; margin:0; padding:10px; }
+body { font-family: 'Roboto', sans-serif; background: #ECF0F1; margin:0; padding:10px; }
 
 /* ヘッダー */
 .header-card {
-  background: linear-gradient(135deg,#2196F3,#64B5F6);
+  background: linear-gradient(135deg,#2C3E50,#34495E);
   color:white; border-radius:15px; padding:15px; margin-bottom:15px; text-align:center;
-  box-shadow:0 6px 12px rgba(0,0,0,0.1);
+  box-shadow:0 6px 12px rgba(0,0,0,0.15);
 }
 .header-card h1 {margin:0; font-size:22px; font-weight:700;}
 .header-card p {margin:5px 0 0 0; font-size:16px; font-weight:500;}
@@ -22,17 +22,17 @@ body { font-family: 'Roboto', sans-serif; background: #f0f2f5; margin:0; padding
 button { font-size:18px; font-weight:500; padding:20px; border:none; border-radius:50px; color:white; cursor:pointer;
          transition: transform 0.15s, filter 0.15s, box-shadow 0.2s; box-shadow:0 4px 6px rgba(0,0,0,0.15);}
 button:active { transform: scale(0.95); filter: brightness(1.1); box-shadow:0 2px 3px rgba(0,0,0,0.2);}
-.green {background: linear-gradient(135deg,#4CAF50,#81C784);}
-.red {background: linear-gradient(135deg,#F44336,#E57373);}
-.orange {background: linear-gradient(135deg,#FF9800,#FFB74D);}
-.blue {background: linear-gradient(135deg,#2196F3,#64B5F6);}
+.green {background: linear-gradient(135deg,#1F3A57,#2A4B70);}
+.red   {background: linear-gradient(135deg,#7B2E3B,#9B3D4D);}
+.orange{background: linear-gradient(135deg,#4A6073,#627D8D);}
+.blue  {background: linear-gradient(135deg,#5D6D7E,#7F8C97);}
 
 /* カード */
 .card { background:white; border-radius:15px; padding:20px; margin:10px 0;
-        box-shadow:0 6px 12px rgba(0,0,0,0.08); opacity:0; transform:translateY(15px);
+        box-shadow:0 6px 12px rgba(44,62,80,0.08); opacity:0; transform:translateY(15px);
         transition: all 0.5s ease;}
 .card.visible {opacity:1; transform:translateY(0);}
-.status p {margin:6px 0; font-size:16px; line-height:1.4;}
+.status p {margin:6px 0; font-size:16px; line-height:1.4; color:#2C3E50;}
 
 /* トースト */
 #toast { position: fixed; bottom:20px; left:50%; transform:translateX(-50%);
@@ -43,8 +43,8 @@ button:active { transform: scale(0.95); filter: brightness(1.1); box-shadow:0 2p
 <body>
 
 <div class="header-card">
-  <h1>アビームコンサルティング</h1>
-  <p>宮嵜　凌 / 社員番号: 758686</p>
+  <h1>株式会社サンプル</h1>
+  <p>山田 太郎 / 社員番号: 12345</p>
 </div>
 
 <div class="button-grid">
@@ -106,10 +106,10 @@ google.charts.load('current', {'packages':['corechart']});
 function drawChart(d){
   var data = google.visualization.arrayToDataTable([
     ['項目','時間',{ role: 'style' }],
-    ['労働', d.work||0, 'color:rgba(76,175,80,0.8)'],
-    ['残業', d.overtime||0, 'color:rgba(244,67,54,0.8)'],
-    ['深夜', d.midnight||0, 'color:rgba(33,150,243,0.8)'],
-    ['外出', d.break||0, 'color:rgba(255,152,0,0.8)']
+    ['労働', d.work||0, 'color:rgba(31,58,87,0.8)'],
+    ['残業', d.overtime||0, 'color:rgba(123,46,59,0.8)'],
+    ['深夜', d.midnight||0, 'color:rgba(93,109,126,0.8)'],
+    ['外出', d.break||0, 'color:rgba(74,96,115,0.8)']
   ]);
   var options = { title:'月次勤怠グラフ', legend:{position:'bottom'}, animation:{startup:true,duration:600,easing:'out'}};
   var chart = new google.visualization.ColumnChart(document.getElementById('chart_div'));
@@ -125,7 +125,7 @@ window.addEventListener('beforeinstallprompt', e=>{
   const btn=document.createElement('button');
   btn.innerText="ホーム画面に追加";
   btn.style.position="fixed"; btn.style.bottom="20px"; btn.style.left="50%"; btn.style.transform="translateX(-50%)";
-  btn.style.padding="12px 20px"; btn.style.borderRadius="20px"; btn.style.background="#2196F3"; btn.style.color="white";
+  btn.style.padding="12px 20px"; btn.style.borderRadius="20px"; btn.style.background="#34495E"; btn.style.color="white";
   btn.style.fontWeight="500"; btn.style.zIndex="1000";
   btn.onclick=()=>{ deferredPrompt.prompt(); deferredPrompt.userChoice.then(()=>{ deferredPrompt=null; btn.remove(); }); };
   document.body.appendChild(btn);
