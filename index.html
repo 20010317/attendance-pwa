@@ -3,97 +3,92 @@
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>勤怠管理アプリ</title>
-<script src="https://www.gstatic.com/charts/loader.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Orbitron:wght@500;700&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/charts/loader.js"></script>
 <style>
-body { 
-  font-family: 'Roboto', sans-serif; 
-  background: #F0F0F0; 
-  margin:0; 
-  padding:10px 0 60px 0;
+/* 全体 */
+body {
+  font-family: 'Roboto', sans-serif;
+  background: #F5F6FA; /* 明るいグレー系 */
+  margin:0; padding:0 0 60px 0;
 }
 
 /* ヘッダー */
 .header-card {
-  background: linear-gradient(135deg,#2C3E50,#34495E);
-  color:white; border-radius:15px; padding:15px; margin-bottom:15px; text-align:center;
-  box-shadow:0 6px 12px rgba(0,0,0,0.15);
+  background:#3A6EA5;
+  color:white; border-radius:10px; padding:15px 20px;
+  margin:15px; text-align:center;
+  box-shadow:0 4px 10px rgba(0,0,0,0.1);
 }
-.header-card h1 {margin:0; font-size:22px; font-weight:700;}
-.header-card p {margin:5px 0 0 0; font-size:16px; font-weight:500;}
+.header-card h1 {margin:0; font-size:20px; font-weight:700;}
+.header-card p {margin:5px 0 0 0; font-size:14px; font-weight:500;}
 
-/* 打刻ボタン */
-.button-grid { display:grid; grid-template-columns: repeat(2, 1fr); gap:15px; margin-bottom:20px; }
-button { font-size:18px; font-weight:500; padding:20px; border:none; border-radius:50px; color:white; cursor:pointer;
-         transition: transform 0.15s, filter 0.15s, box-shadow 0.2s; box-shadow:0 4px 6px rgba(0,0,0,0.15);}
-button:active { transform: scale(0.95); filter: brightness(1.1); box-shadow:0 2px 3px rgba(0,0,0,0.2);}
-.green {background: linear-gradient(135deg,#1F3A57,#2A4B70);}
-.red   {background: linear-gradient(135deg,#7B2E3B,#9B3D4D);}
-.orange{background: linear-gradient(135deg,#4A6073,#627D8D);}
-.blue  {background: linear-gradient(135deg,#5D6D7E,#7F8C97);}
+/* ボタングリッド */
+.button-grid {
+  display:grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap:15px;
+  margin:0 15px 20px 15px;
+}
+button {
+  font-size:16px; font-weight:500; padding:18px; border:none;
+  border-radius:50px; color:white; cursor:pointer;
+  transition: 0.15s; box-shadow:0 4px 8px rgba(0,0,0,0.1);
+}
+button:active { transform:scale(0.95); filter: brightness(1.1);}
+.green {background:#2C82C9;}
+.red   {background:#E74C3C;}
+.orange{background:#F39C12;}
+.blue  {background:#3498DB;}
 
-/* 年月日＋曜日＋デジタル時計カード */
+/* 時計カード */
 #clockCard {
-  background: #111111; /* 薄め黒背景 */
-  border-radius: 15px;
-  padding: 15px 10px;
-  margin: 0 10px 15px 10px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-  text-align: center;
-  overflow: hidden;
-}
-
-/* 年月日＋曜日 */
-#dateDisplay {
-  font-size:18px; 
-  color:#66FF66; /* 柔らか緑 */
-  margin-bottom:5px;
-  font-weight:500;
-}
-
-/* デジタル時計 */
-#digitalClock {
-  font-family: 'Orbitron', 'Courier New', monospace;
-  font-size:48px; 
-  color:#66FF66; /* 柔らか緑 */
-  letter-spacing:3px;
-  margin:0;
-  width:100%;
+  background:#1C1C1C;
+  border-radius:10px; margin:0 15px 15px 15px;
+  padding:12px 0; text-align:center; color:#66FF66;
+  box-shadow:0 4px 12px rgba(0,0,0,0.2);
   overflow:hidden;
-  word-break: break-word;
 }
+#dateDisplay { font-size:16px; margin-bottom:4px; }
+#digitalClock { font-family:'Orbitron','Courier New',monospace; font-size:44px; letter-spacing:2px; margin:0; }
 
 /* カード */
-.card { background:white; border-radius:15px; padding:20px; margin:10px 10px;
-        box-shadow:0 6px 12px rgba(44,62,80,0.08); opacity:0; transform:translateY(15px);
-        transition: all 0.5s ease;}
+.card {
+  background:white; border-radius:10px; padding:15px; margin:10px 15px;
+  box-shadow:0 4px 10px rgba(0,0,0,0.08); opacity:0; transform:translateY(10px);
+  transition: all 0.5s ease;
+}
 .card.visible {opacity:1; transform:translateY(0);}
-.status p {margin:6px 0; font-size:16px; line-height:1.4; color:#2C3E50;}
+.card h3 {margin-top:0; font-size:16px; font-weight:500; color:#34495E;}
+.card p {margin:6px 0; font-size:14px; line-height:1.4; color:#2C3E50; white-space:pre-line;}
+
+/* グラフ */
+#chart_div { width:100%; height:250px; }
 
 /* トースト */
-#toast { position: fixed; bottom:70px; left:50%; transform:translateX(-50%);
-        background: rgba(0,0,0,0.75); color:white; padding:12px 25px; border-radius:25px;
-        opacity:0; transition: opacity 0.4s; font-weight:500; z-index:1000;}
+#toast {
+  position:fixed; bottom:70px; left:50%; transform:translateX(-50%);
+  background: rgba(0,0,0,0.7); color:white; padding:10px 25px; border-radius:25px;
+  opacity:0; transition:0.4s; font-weight:500; z-index:1000;
+}
 
 /* 下部ステータスバー */
 .footer-bar {
-  position: fixed; bottom:0; left:0; width:100%;
-  background: #34495E;
-  color: #ECF0F1;
-  font-size: 14px; font-weight: 500;
-  text-align: center;
-  padding: 10px 0;
-  box-shadow: 0 -4px 6px rgba(0,0,0,0.1);
+  position:fixed; bottom:0; left:0; width:100%;
+  background:#34495E; color:#ECF0F1; font-size:14px; font-weight:500;
+  text-align:center; padding:10px 0; box-shadow:0 -3px 6px rgba(0,0,0,0.1);
 }
 </style>
 </head>
 <body>
 
+<!-- ヘッダー -->
 <div class="header-card">
   <h1>株式会社サンプル</h1>
   <p>山田 太郎 / 社員番号: 12345</p>
 </div>
 
+<!-- 打刻ボタン -->
 <div class="button-grid">
   <button class="green" onclick="post('出勤')">🟢 出勤</button>
   <button class="red" onclick="post('退勤')">🔴 退勤</button>
@@ -101,24 +96,27 @@ button:active { transform: scale(0.95); filter: brightness(1.1); box-shadow:0 2p
   <button class="blue" onclick="post('戻り')">🔵 戻り</button>
 </div>
 
-<!-- 年月日＋曜日＋デジタル時計カード -->
+<!-- 時計カード -->
 <div id="clockCard">
   <div id="dateDisplay">----/--/-- (---)</div>
   <div id="digitalClock">--:--:--</div>
 </div>
 
+<!-- 今日の勤務状況 -->
 <div class="card status" id="todayCard">
-<h3>今日の勤務状況</h3>
-<p id="todayStatus">読み込み中...</p>
+  <h3>今日の勤務状況</h3>
+  <p id="todayStatus">読み込み中...</p>
 </div>
 
+<!-- 月次サマリー -->
 <div class="card status" id="monthCard">
-<h3>月次サマリー</h3>
-<p id="monthSummary">読み込み中...</p>
+  <h3>月次サマリー</h3>
+  <p id="monthSummary">読み込み中...</p>
 </div>
 
+<!-- グラフカード -->
 <div class="card" id="chartCard">
-<div id="chart_div" style="width:100%; height:300px;"></div>
+  <div id="chart_div"></div>
 </div>
 
 <div id="toast"></div>
@@ -130,34 +128,32 @@ button:active { transform: scale(0.95); filter: brightness(1.1); box-shadow:0 2p
 <script>
 const WEBAPP_URL = '【ここにWebアプリURL】';
 
-// トースト表示
+// トースト
 function showToast(msg){
   const toast = document.getElementById('toast');
   toast.innerText = msg; toast.style.opacity = 1;
   setTimeout(()=>{ toast.style.opacity=0; }, 1500);
 }
 
-// 打刻ボタン押下
+// 打刻ボタン
 function post(type){
   fetch(WEBAPP_URL, { method:'POST', body: JSON.stringify({type:type}) })
   .then(r=>r.json()).then(d=>{
     showToast(d.status+(d.message?': '+d.message:''));
     loadStatus();
-  }).catch(e=>{ showToast('通信エラー'); });
+  }).catch(()=>showToast('通信エラー'));
 }
 
 // 勤務状況読み込み
 function loadStatus(){
   fetch(WEBAPP_URL+'?type=status')
   .then(r=>r.json()).then(d=>{
-    const todayText =
+    document.getElementById('todayStatus').innerText =
       `出勤: ${d.checkIn}\n退勤: ${d.checkOut}\n実労働: ${d.work}\n残業: ${d.overtime}\n外出: ${d.break}\n深夜: ${d.midnight}`;
-    document.getElementById('todayStatus').innerText = todayText;
     document.getElementById('todayCard').classList.add('visible');
 
-    const monthText =
+    document.getElementById('monthSummary').innerText =
       `出勤日数: ${d.days}\n労働合計: ${d.totalWork}\n残業合計: ${d.totalOvertime}\n深夜合計: ${d.totalMidnight}\n外出合計: ${d.totalBreak}`;
-    document.getElementById('monthSummary').innerText = monthText;
     document.getElementById('monthCard').classList.add('visible');
 
     drawChart(d);
@@ -167,55 +163,38 @@ function loadStatus(){
   });
 }
 
-// 年月日＋曜日と時計更新
-function updateDateTime() {
-  const now = new Date();
-  const year = now.getFullYear();
-  const month = (now.getMonth()+1).toString().padStart(2,'0');
-  const day = now.getDate().toString().padStart(2,'0');
-  const weekdays = ['日','月','火','水','木','金','土'];
-  const weekday = weekdays[now.getDay()];
-  document.getElementById('dateDisplay').innerText = `${year}/${month}/${day} (${weekday})`;
-
-  const timeString = now.getHours().toString().padStart(2,'0') + ':' +
-                     now.getMinutes().toString().padStart(2,'0') + ':' +
-                     now.getSeconds().toString().padStart(2,'0');
-  document.getElementById('digitalClock').innerText = timeString;
+// 年月日＋曜日＋時計
+function updateDateTime(){
+  const now=new Date();
+  const year=now.getFullYear();
+  const month=(now.getMonth()+1).toString().padStart(2,'0');
+  const day=now.getDate().toString().padStart(2,'0');
+  const weekdays=['日','月','火','水','木','金','土'];
+  const weekday=weekdays[now.getDay()];
+  document.getElementById('dateDisplay').innerText=`${year}/${month}/${day} (${weekday})`;
+  const timeString=now.getHours().toString().padStart(2,'0')+':'+
+                   now.getMinutes().toString().padStart(2,'0')+':'+
+                   now.getSeconds().toString().padStart(2,'0');
+  document.getElementById('digitalClock').innerText=timeString;
 }
 setInterval(updateDateTime,1000);
 updateDateTime();
 
-// グラフ描画
+// グラフ
 google.charts.load('current', {'packages':['corechart']});
 function drawChart(d){
-  var data = google.visualization.arrayToDataTable([
-    ['項目','時間',{ role: 'style' }],
-    ['労働', d.work||0, 'color:rgba(31,58,87,0.8)'],
-    ['残業', d.overtime||0, 'color:rgba(123,46,59,0.8)'],
-    ['深夜', d.midnight||0, 'color:rgba(93,109,126,0.8)'],
-    ['外出', d.break||0, 'color:rgba(74,96,115,0.8)']
+  const data=google.visualization.arrayToDataTable([
+    ['項目','時間',{role:'style'}],
+    ['労働', d.work||0, 'color:#2C82C9'],
+    ['残業', d.overtime||0, 'color:#E74C3C'],
+    ['深夜', d.midnight||0, 'color:#9B59B6'],
+    ['外出', d.break||0, 'color:#F39C12']
   ]);
-  var options = { title:'月次勤怠グラフ', legend:{position:'bottom'}, animation:{startup:true,duration:600,easing:'out'}};
-  var chart = new google.visualization.ColumnChart(document.getElementById('chart_div'));
+  const options={title:'月次勤怠グラフ', legend:{position:'bottom'}, animation:{startup:true,duration:600,easing:'out'}};
+  const chart=new google.visualization.ColumnChart(document.getElementById('chart_div'));
   chart.draw(data, options);
 }
 google.charts.setOnLoadCallback(loadStatus);
-
-// PWAサービスワーカー登録
-if('serviceWorker' in navigator){ navigator.serviceWorker.register('service-worker.js'); }
-
-// ホーム画面追加ボタン
-let deferredPrompt;
-window.addEventListener('beforeinstallprompt', e=>{
-  e.preventDefault(); deferredPrompt=e;
-  const btn=document.createElement('button');
-  btn.innerText="ホーム画面に追加";
-  btn.style.position="fixed"; btn.style.bottom="60px"; btn.style.left="50%"; btn.style.transform="translateX(-50%)";
-  btn.style.padding="12px 20px"; btn.style.borderRadius="20px"; btn.style.background="#34495E"; btn.style.color="white";
-  btn.style.fontWeight="500"; btn.style.zIndex="1000";
-  btn.onclick=()=>{ deferredPrompt.prompt(); deferredPrompt.userChoice.then(()=>{ deferredPrompt=null; btn.remove(); }); };
-  document.body.appendChild(btn);
-});
 </script>
 </body>
 </html>
