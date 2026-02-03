@@ -19,10 +19,12 @@ body {
 .header {
   background:#003366; /* ディープブルー */
   color:white; border-radius:0 0 12px 12px;
-  padding:15px 20px; text-align:left;
+  padding:15px 20px;
   box-shadow:0 4px 12px rgba(0,0,0,0.15);
   display:flex; flex-direction:column; align-items:flex-start;
 }
+.header-company { font-size:22px; font-weight:700; margin-bottom:4px; }
+.header-employee { font-size:16px; margin-bottom:8px; }
 .header-date { font-size:18px; margin-bottom:8px; font-weight:500; }
 .header-clock { font-family:'Orbitron','Courier New',monospace; font-size:48px; letter-spacing:2px; line-height:1; }
 .header-clock span.sec { font-size:28px; }
@@ -39,7 +41,7 @@ body {
 }
 button.action-btn {
   font-size:16px; font-weight:500; padding:20px; border-radius:12px;
-  display:flex; align-items:center; justify-content:center; gap:8px;
+  display:flex; align-items:center; justify-content:center;
   cursor:pointer; transition:0.15s; box-shadow:0 4px 8px rgba(0,0,0,0.08);
 }
 button.action-btn:active { transform:scale(0.97); }
@@ -97,6 +99,8 @@ button.action-btn:active { transform:scale(0.97); }
   .header-clock span.sec { font-size:20px; }
   button.action-btn { font-size:14px; padding:16px; }
   .summary-field { font-size:12px; }
+  .header-company { font-size:18px; }
+  .header-employee { font-size:14px; }
 }
 </style>
 </head>
@@ -104,6 +108,8 @@ button.action-btn:active { transform:scale(0.97); }
 
 <!-- ヘッダー -->
 <div class="header">
+  <div class="header-company" id="companyName">アビームコンサルティング株式会社</div>
+  <div class="header-employee" id="employeeInfo">宮嵜 凌 / 社員番号:16781</div>
   <div class="header-date" id="dateDisplay">----/--/-- (---)</div>
   <div class="header-clock" id="digitalClock">--:--<span class="sec">--</span></div>
   <div class="header-last">
@@ -114,12 +120,12 @@ button.action-btn:active { transform:scale(0.97); }
 
 <!-- 打刻ボタン 2列 x 3行 -->
 <div class="button-grid">
-  <button class="action-btn btn-start" onclick="post('勤務開始')">🟢 勤務開始</button>
-  <button class="action-btn btn-end" onclick="post('勤務終了')">🔴 勤務終了</button>
-  <button class="action-btn btn-break" onclick="post('休憩開始')">⏳ 休憩開始</button>
-  <button class="action-btn btn-return" onclick="post('休憩終了')">⏳ 休憩終了</button>
-  <button class="action-btn btn-out" onclick="post('外出')">🚶‍♂️ 外出</button>
-  <button class="action-btn btn-back" onclick="post('戻り')">🏃‍♂️ 戻り</button>
+  <button class="action-btn btn-start" onclick="post('勤務開始')">勤務開始</button>
+  <button class="action-btn btn-end" onclick="post('勤務終了')">勤務終了</button>
+  <button class="action-btn btn-break" onclick="post('休憩開始')">休憩開始</button>
+  <button class="action-btn btn-return" onclick="post('休憩終了')">休憩終了</button>
+  <button class="action-btn btn-out" onclick="post('外出')">外出</button>
+  <button class="action-btn btn-back" onclick="post('戻り')">戻り</button>
 </div>
 
 <!-- 入力・情報エリア -->
