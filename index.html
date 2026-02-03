@@ -1,141 +1,160 @@
 <!DOCTYPE html>
-<html>
+<html lang="ja">
 <head>
+<meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>勤怠管理アプリ</title>
+<title>勤怠管理システム</title>
 <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Orbitron:wght@500;700&display=swap" rel="stylesheet">
 <script src="https://www.gstatic.com/charts/loader.js"></script>
 <style>
 /* 全体 */
 body {
   font-family: 'Roboto', sans-serif;
-  background: #F5F6FA; /* 明るいグレー系 */
+  background: #FFFFFF;
   margin:0; padding:0 0 60px 0;
+  color:#2C3E50;
 }
 
 /* ヘッダー */
-.header-card {
-  background:#3A6EA5;
-  color:white; border-radius:10px; padding:15px 20px;
-  margin:15px; text-align:center;
-  box-shadow:0 4px 10px rgba(0,0,0,0.1);
+.header {
+  background:#003366; /* ディープブルー */
+  color:white; border-radius:0 0 12px 12px;
+  padding:15px 20px; text-align:left;
+  box-shadow:0 4px 12px rgba(0,0,0,0.15);
+  display:flex; flex-direction:column; align-items:flex-start;
 }
-.header-card h1 {margin:0; font-size:20px; font-weight:700;}
-.header-card p {margin:5px 0 0 0; font-size:14px; font-weight:500;}
+.header-date { font-size:18px; margin-bottom:8px; font-weight:500; }
+.header-clock { font-family:'Orbitron','Courier New',monospace; font-size:48px; letter-spacing:2px; line-height:1; }
+.header-clock span.sec { font-size:28px; }
+.header-last { font-size:14px; margin-top:8px; display:flex; align-items:center; gap:10px; }
+.header-last button { background:#E74C3C; color:white; border:none; border-radius:8px; padding:4px 8px; cursor:pointer; font-size:12px; transition:0.15s; }
+.header-last button:active { transform:scale(0.95); }
 
-/* ボタングリッド */
+/* 打刻ボタン 2x2 */
 .button-grid {
   display:grid;
   grid-template-columns: repeat(2, 1fr);
   gap:15px;
-  margin:0 15px 20px 15px;
+  margin:20px 15px;
 }
-button {
-  font-size:16px; font-weight:500; padding:18px; border:none;
-  border-radius:50px; color:white; cursor:pointer;
-  transition: 0.15s; box-shadow:0 4px 8px rgba(0,0,0,0.1);
+button.action-btn {
+  font-size:16px; font-weight:500; padding:20px; border-radius:12px;
+  display:flex; align-items:center; justify-content:center; gap:8px;
+  cursor:pointer; transition:0.15s; box-shadow:0 4px 8px rgba(0,0,0,0.08);
 }
-button:active { transform:scale(0.95); filter: brightness(1.1);}
-.green {background:#2C82C9;}
-.red   {background:#E74C3C;}
-.orange{background:#F39C12;}
-.blue  {background:#3498DB;}
+button.action-btn:active { transform:scale(0.97); }
 
-/* 時計カード */
-#clockCard {
-  background:#1C1C1C;
-  border-radius:10px; margin:0 15px 15px 15px;
-  padding:12px 0; text-align:center; color:#66FF66;
-  box-shadow:0 4px 12px rgba(0,0,0,0.2);
-  overflow:hidden;
-}
-#dateDisplay { font-size:16px; margin-bottom:4px; }
-#digitalClock { font-family:'Orbitron','Courier New',monospace; font-size:44px; letter-spacing:2px; margin:0; }
+/* 色分け */
+.btn-start { background:#003366; color:white; }       /* 勤務開始 */
+.btn-end   { background:#003366; color:white; }       /* 勤務終了 */
+.btn-break { background:white; color:#003366; border:2px solid #003366; }  /* 休憩開始 */
+.btn-return{ background:white; color:#003366; border:2px solid #003366; }  /* 休憩終了 */
 
-/* カード */
-.card {
-  background:white; border-radius:10px; padding:15px; margin:10px 15px;
-  box-shadow:0 4px 10px rgba(0,0,0,0.08); opacity:0; transform:translateY(10px);
-  transition: all 0.5s ease;
+/* 入力・情報エリア */
+.info-section {
+  margin:15px; display:flex; flex-direction:column; gap:15px;
 }
-.card.visible {opacity:1; transform:translateY(0);}
-.card h3 {margin-top:0; font-size:16px; font-weight:500; color:#34495E;}
-.card p {margin:6px 0; font-size:14px; line-height:1.4; color:#2C3E50; white-space:pre-line;}
 
-/* グラフ */
+/* メモ欄 */
+.memo-input {
+  width:100%; padding:10px; border-radius:8px; border:1px solid #BDC3C7;
+  font-size:14px; resize:none; min-height:50px;
+}
+
+/* 勤務状況サマリー */
+.summary-card {
+  background:#F0F0F0; border-radius:12px; padding:15px; display:flex; flex-direction:column; gap:10px;
+}
+.summary-title { font-weight:500; font-size:16px; margin-bottom:5px; }
+.summary-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(100px,1fr)); gap:10px; }
+.summary-field {
+  background:white; border-radius:8px; padding:10px; text-align:center; font-size:14px;
+}
+
+/* グラフカード */
+.chart-card { background:white; border-radius:12px; padding:15px; margin:0 15px 15px 15px; box-shadow:0 4px 8px rgba(0,0,0,0.08); }
 #chart_div { width:100%; height:250px; }
 
-/* トースト */
+/* 下部ステータスバー */
+.footer-bar {
+  position:fixed; bottom:0; left:0; width:100%;
+  background:#34495E; color:white; font-size:14px; font-weight:500;
+  text-align:center; padding:10px 0; box-shadow:0 -3px 6px rgba(0,0,0,0.1);
+}
+
+/* トースト通知 */
 #toast {
   position:fixed; bottom:70px; left:50%; transform:translateX(-50%);
   background: rgba(0,0,0,0.7); color:white; padding:10px 25px; border-radius:25px;
   opacity:0; transition:0.4s; font-weight:500; z-index:1000;
 }
 
-/* 下部ステータスバー */
-.footer-bar {
-  position:fixed; bottom:0; left:0; width:100%;
-  background:#34495E; color:#ECF0F1; font-size:14px; font-weight:500;
-  text-align:center; padding:10px 0; box-shadow:0 -3px 6px rgba(0,0,0,0.1);
+/* レスポンシブ */
+@media(max-width:600px){
+  .header-clock { font-size:36px; }
+  .header-clock span.sec { font-size:20px; }
+  button.action-btn { font-size:14px; padding:16px; }
+  .summary-field { font-size:12px; }
 }
 </style>
 </head>
 <body>
 
 <!-- ヘッダー -->
-<div class="header-card">
-  <h1>株式会社サンプル</h1>
-  <p>山田 太郎 / 社員番号: 12345</p>
+<div class="header">
+  <div class="header-date" id="dateDisplay">----/--/-- (---)</div>
+  <div class="header-clock" id="digitalClock">--:--<span class="sec">--</span></div>
+  <div class="header-last">
+    <span id="lastStamp">直前の打刻：[勤務開始] ----/-- --:--</span>
+    <button onclick="cancelLast()">打刻取消</button>
+  </div>
 </div>
 
-<!-- 打刻ボタン -->
+<!-- 打刻ボタン 2x2 -->
 <div class="button-grid">
-  <button class="green" onclick="post('出勤')">🟢 出勤</button>
-  <button class="red" onclick="post('退勤')">🔴 退勤</button>
-  <button class="orange" onclick="post('外出')">🟠 外出</button>
-  <button class="blue" onclick="post('戻り')">🔵 戻り</button>
+  <button class="action-btn btn-start" onclick="post('勤務開始')">🟢 勤務開始</button>
+  <button class="action-btn btn-end" onclick="post('勤務終了')">🔴 勤務終了</button>
+  <button class="action-btn btn-break" onclick="post('休憩開始')">⏳ 休憩開始</button>
+  <button class="action-btn btn-return" onclick="post('休憩終了')">⏳ 休憩終了</button>
 </div>
 
-<!-- 時計カード -->
-<div id="clockCard">
-  <div id="dateDisplay">----/--/-- (---)</div>
-  <div id="digitalClock">--:--:--</div>
-</div>
+<!-- 入力・情報エリア -->
+<div class="info-section">
+  <textarea class="memo-input" placeholder="メモを記入してください"></textarea>
 
-<!-- 今日の勤務状況 -->
-<div class="card status" id="todayCard">
-  <h3>今日の勤務状況</h3>
-  <p id="todayStatus">読み込み中...</p>
-</div>
-
-<!-- 月次サマリー -->
-<div class="card status" id="monthCard">
-  <h3>月次サマリー</h3>
-  <p id="monthSummary">読み込み中...</p>
+  <div class="summary-card">
+    <div class="summary-title">タイムカード入力</div>
+    <div class="summary-grid">
+      <div class="summary-field" id="planned">出勤予定：--:-----:--<br>所定時間数：--:--</div>
+      <div class="summary-field" id="startTime">開始時刻：--:--</div>
+      <div class="summary-field" id="endTime">終了時刻：--:--</div>
+      <div class="summary-field" id="breakTime">休憩時間数：--:--</div>
+      <div class="summary-field" id="workTime">勤務時間数：--:--</div>
+    </div>
+  </div>
 </div>
 
 <!-- グラフカード -->
-<div class="card" id="chartCard">
+<div class="chart-card">
   <div id="chart_div"></div>
 </div>
 
+<!-- トースト通知 -->
 <div id="toast"></div>
 
-<div class="footer-bar" id="footerStatus">
-  勤務 0h | 残業 0h | 外出 0h
-</div>
+<!-- 下部ステータスバー -->
+<div class="footer-bar" id="footerStatus">勤務 0h | 残業 0h | 外出 0h</div>
 
 <script>
 const WEBAPP_URL = '【ここにWebアプリURL】';
 
-// トースト
 function showToast(msg){
-  const toast = document.getElementById('toast');
-  toast.innerText = msg; toast.style.opacity = 1;
-  setTimeout(()=>{ toast.style.opacity=0; }, 1500);
+  const toast=document.getElementById('toast');
+  toast.innerText=msg; toast.style.opacity=1;
+  setTimeout(()=>{ toast.style.opacity=0; },1500);
 }
 
-// 打刻ボタン
+// 打刻ボタン送信
 function post(type){
   fetch(WEBAPP_URL, { method:'POST', body: JSON.stringify({type:type}) })
   .then(r=>r.json()).then(d=>{
@@ -144,26 +163,37 @@ function post(type){
   }).catch(()=>showToast('通信エラー'));
 }
 
+// 打刻取消（最後の打刻）
+function cancelLast(){
+  fetch(WEBAPP_URL+'?type=cancel', { method:'POST' })
+  .then(r=>r.json()).then(d=>{
+    showToast(d.status);
+    loadStatus();
+  }).catch(()=>showToast('通信エラー'));
+}
+
 // 勤務状況読み込み
 function loadStatus(){
   fetch(WEBAPP_URL+'?type=status')
   .then(r=>r.json()).then(d=>{
-    document.getElementById('todayStatus').innerText =
-      `出勤: ${d.checkIn}\n退勤: ${d.checkOut}\n実労働: ${d.work}\n残業: ${d.overtime}\n外出: ${d.break}\n深夜: ${d.midnight}`;
-    document.getElementById('todayCard').classList.add('visible');
+    // タイムカード情報
+    document.getElementById('lastStamp').innerText=`直前の打刻：[${d.lastType||''}] ${d.lastTime||''}`;
+    document.getElementById('planned').innerHTML=`出勤予定：${d.plannedIn||'--:--'}-${d.plannedOut||'--:--'}<br>所定時間数：${d.standard||'--:--'}`;
+    document.getElementById('startTime').innerText=`開始時刻：${d.checkIn||'--:--'}`;
+    document.getElementById('endTime').innerText=`終了時刻：${d.checkOut||'--:--'}`;
+    document.getElementById('breakTime').innerText=`休憩時間数：${d.break||'--:--'}`;
+    document.getElementById('workTime').innerText=`勤務時間数：${d.work||'--:--'}`;
 
-    document.getElementById('monthSummary').innerText =
-      `出勤日数: ${d.days}\n労働合計: ${d.totalWork}\n残業合計: ${d.totalOvertime}\n深夜合計: ${d.totalMidnight}\n外出合計: ${d.totalBreak}`;
-    document.getElementById('monthCard').classList.add('visible');
+    // 下部ステータス
+    document.getElementById('footerStatus').innerText=
+      `勤務 ${d.work||0}h | 残業 ${d.overtime||0}h | 外出 ${d.break||0}h`;
 
+    // グラフ描画
     drawChart(d);
-
-    document.getElementById('footerStatus').innerText =
-      `勤務 ${d.work || 0}h | 残業 ${d.overtime || 0}h | 外出 ${d.break || 0}h`;
   });
 }
 
-// 年月日＋曜日＋時計
+// デジタル時計
 function updateDateTime(){
   const now=new Date();
   const year=now.getFullYear();
@@ -172,10 +202,11 @@ function updateDateTime(){
   const weekdays=['日','月','火','水','木','金','土'];
   const weekday=weekdays[now.getDay()];
   document.getElementById('dateDisplay').innerText=`${year}/${month}/${day} (${weekday})`;
-  const timeString=now.getHours().toString().padStart(2,'0')+':'+
-                   now.getMinutes().toString().padStart(2,'0')+':'+
-                   now.getSeconds().toString().padStart(2,'0');
-  document.getElementById('digitalClock').innerText=timeString;
+
+  const h=now.getHours().toString().padStart(2,'0');
+  const m=now.getMinutes().toString().padStart(2,'0');
+  const s=now.getSeconds().toString().padStart(2,'0');
+  document.getElementById('digitalClock').innerHTML=`${h}:${m}<span class="sec">${s}</span>`;
 }
 setInterval(updateDateTime,1000);
 updateDateTime();
@@ -185,10 +216,10 @@ google.charts.load('current', {'packages':['corechart']});
 function drawChart(d){
   const data=google.visualization.arrayToDataTable([
     ['項目','時間',{role:'style'}],
-    ['労働', d.work||0, 'color:#2C82C9'],
+    ['労働', d.work||0, 'color:#003366'],
     ['残業', d.overtime||0, 'color:#E74C3C'],
-    ['深夜', d.midnight||0, 'color:#9B59B6'],
-    ['外出', d.break||0, 'color:#F39C12']
+    ['休憩', d.break||0, 'color:#F39C12'],
+    ['深夜', d.midnight||0, 'color:#9B59B6']
   ]);
   const options={title:'月次勤怠グラフ', legend:{position:'bottom'}, animation:{startup:true,duration:600,easing:'out'}};
   const chart=new google.visualization.ColumnChart(document.getElementById('chart_div'));
