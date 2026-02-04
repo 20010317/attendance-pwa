@@ -13,48 +13,48 @@
 <body>
 
 <div class="header-top">
-  <div class="header-company" id="companyName">アビームコンサルティング株式会社</div>
-  <div class="header-employee" id="employeeInfo">宮嵜 凌 / 社員番号:964255</div>
+<div class="header-company" id="companyName">アビームコンサルティング株式会社</div>
+<div class="header-employee" id="employeeInfo">宮嵜 凌 / 社員番号:964255</div>
 </div>
 <div class="header-bottom">
-  <div class="header-clock" id="digitalClock">--:--<span class="sec">--</span></div>
-  <div class="header-date" id="dateDisplay">----/--/-- (---)</div>
-  <div class="header-last">
-    <span id="lastStamp">直前の打刻：[勤務開始] ----/-- --:--</span>
-    <button onclick="cancelLast()">打刻取消</button>
-  </div>
+<div class="header-clock" id="digitalClock">--:--<span class="sec">--</span></div>
+<div class="header-date" id="dateDisplay">----/--/-- (---)</div>
+<div class="header-last">
+<span id="lastStamp">直前の打刻：[勤務開始] ----/-- --:--</span>
+<button onclick="cancelLast()">打刻取消</button>
+</div>
 </div>
 
 <div class="button-grid">
-  <button class="action-btn btn-start" onclick="confirmPost('勤務開始')">勤務開始</button>
-  <button class="action-btn btn-end" onclick="confirmPost('勤務終了')">勤務終了</button>
-  <button class="action-btn btn-break" onclick="confirmPost('休憩開始')">休憩開始</button>
-  <button class="action-btn btn-return" onclick="confirmPost('休憩終了')">休憩終了</button>
-  <button class="action-btn btn-out" onclick="confirmPost('外出')">外出</button>
-  <button class="action-btn btn-back" onclick="confirmPost('戻り')">戻り</button>
+<button class="action-btn btn-start" onclick="confirmPost('勤務開始')">勤務開始</button>
+<button class="action-btn btn-end" onclick="confirmPost('勤務終了')">勤務終了</button>
+<button class="action-btn btn-break" onclick="confirmPost('休憩開始')">休憩開始</button>
+<button class="action-btn btn-return" onclick="confirmPost('休憩終了')">休憩終了</button>
+<button class="action-btn btn-out" onclick="confirmPost('外出')">外出</button>
+<button class="action-btn btn-back" onclick="confirmPost('戻り')">戻り</button>
 </div>
 
 <div class="info-section">
-  <textarea class="memo-input" placeholder="メモを記入してください"></textarea>
-  <div class="summary-card">
-    <div class="summary-title">タイムカード入力</div>
-    <div class="summary-grid">
-      <div class="summary-field" id="planned">出勤予定：--:-- - --:--<br>所定時間数：--:--</div>
-      <div class="summary-field" id="startTime">開始時刻：--:--</div>
-      <div class="summary-field" id="endTime">終了時刻：--:--</div>
-      <div class="summary-field" id="breakTime">休憩時間数：--:--</div>
-      <div class="summary-field" id="workTime">勤務時間数：--:--</div>
-    </div>
-  </div>
+<textarea class="memo-input" placeholder="メモを記入してください"></textarea>
+<div class="summary-card">
+<div class="summary-title">タイムカード入力</div>
+<div class="summary-grid">
+<div class="summary-field" id="planned">出勤予定：--:-- - --:--<br>所定時間数：--:--</div>
+<div class="summary-field" id="startTime">開始時刻：--:--</div>
+<div class="summary-field" id="endTime">終了時刻：--:--</div>
+<div class="summary-field" id="breakTime">休憩時間数：--:--</div>
+<div class="summary-field" id="workTime">勤務時間数：--:--</div>
+</div>
+</div>
 
-  <div class="timebar-card">
-    <div class="timebar-title">勤務時間の可視化</div>
-    <div class="timebar-container" id="timeBar"></div>
-  </div>
+<div class="timebar-card">
+<div class="timebar-title">勤務時間の可視化</div>
+<div class="timebar-container" id="timeBar"></div>
+</div>
 </div>
 
 <div class="chart-card">
-  <div id="chart_div"></div>
+<div id="chart_div"></div>
 </div>
 
 <div id="toast"></div>
@@ -69,42 +69,42 @@ let lock = false;
 
 // 打刻ボタン用：確認ダイアログ + 連打防止
 function confirmPost(type){
-  if(lock) return;
-  if(!confirm(`${type}を打刻しますか？`)) return;
+if(lock) return;
+if(!confirm(`${type}を打刻しますか？`)) return;
 
-  lock = true;
-  fetch(WEBAPP_URL, { method:'POST', body: JSON.stringify({type:type}) })
-    .then(r=>r.json())
-    .then(d=>{
-      showToast(d.status + (d.message? ': '+d.message:''));
-      loadStatus();
-    })
-    .catch(()=>showToast('通信エラー'))
-    .finally(()=>{ setTimeout(()=>{ lock=false; }, 2000); });
+lock = true;
+fetch(WEBAPP_URL, { method:'POST', body: JSON.stringify({type:type}) })
+.then(r=>r.json())
+.then(d=>{
+showToast(d.status + (d.message? ': '+d.message:''));
+loadStatus();
+})
+.catch(()=>showToast('通信エラー'))
+.finally(()=>{ setTimeout(()=>{ lock=false; }, 2000); });
 }
 
 // 打刻取消
 function cancelLast(){
-  fetch(WEBAPP_URL+'?type=cancel',{ method:'POST' })
-    .then(r=>r.json())
-    .then(d=>{ showToast(d.status); loadStatus(); })
-    .catch(()=>showToast('通信エラー'));
+fetch(WEBAPP_URL+'?type=cancel',{ method:'POST' })
+.then(r=>r.json())
+.then(d=>{ showToast(d.status); loadStatus(); })
+.catch(()=>showToast('通信エラー'));
 }
 
 // デジタル時計
 function updateDateTime(){
-  const now=new Date();
-  const year=now.getFullYear();
-  const month=(now.getMonth()+1).toString().padStart(2,'0');
-  const day=now.getDate().toString().padStart(2,'0');
-  const weekdays=['日','月','火','水','木','金','土'];
-  const weekday=weekdays[now.getDay()];
-  document.getElementById('dateDisplay').innerText=`${year}/${month}/${day} (${weekday})`;
+const now=new Date();
+const year=now.getFullYear();
+const month=(now.getMonth()+1).toString().padStart(2,'0');
+const day=now.getDate().toString().padStart(2,'0');
+const weekdays=['日','月','火','水','木','金','土'];
+const weekday=weekdays[now.getDay()];
+document.getElementById('dateDisplay').innerText=`${year}/${month}/${day} (${weekday})`;
 
-  const h=now.getHours().toString().padStart(2,'0');
-  const m=now.getMinutes().toString().padStart(2,'0');
-  const s=now.getSeconds().toString().padStart(2,'0');
-  document.getElementById('digitalClock').innerHTML=`${h}:${m}<span class="sec">${s}</span>`;
+const h=now.getHours().toString().padStart(2,'0');
+const m=now.getMinutes().toString().padStart(2,'0');
+const s=now.getSeconds().toString().padStart(2,'0');
+document.getElementById('digitalClock').innerHTML=`${h}:${m}<span class="sec">${s}</span>`;
 }
 setInterval(updateDateTime,1000);
 updateDateTime();
