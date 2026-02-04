@@ -3,113 +3,155 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>勤怠管理システム</title>
-<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Orbitron:wght@500;700&display=swap" rel="stylesheet">
-<script src="https://www.gstatic.com/charts/loader.js"></script>
+<title>勤怠管理フェーズ2</title>
 <style>
-/* 省略: 前回のフェーズ2 CSSをそのまま使用 */
+/* ---------- CSS ---------- */
+body {
+  font-family: "Roboto", sans-serif;
+  background-color: #f2f2f2;
+  margin:0; padding:0;
+}
+.header-top {
+  background-color: #d9d9d9;
+  padding: 10px;
+}
+.header-company { font-weight: bold; font-size: 1.2em; }
+.header-employee { font-size: 1em; margin-top:5px; }
+.header-bottom { display:flex; justify-content:space-between; align-items:center; background:#fff; padding:10px; }
+.header-clock { font-family: "Orbitron", monospace; font-size:2em; color:#0f0; }
+.header-clock .sec { font-size:1em; }
+.button-grid { display:grid; grid-template-columns: repeat(3,1fr); gap:10px; padding:10px; }
+.action-btn { padding:20px; font-size:1em; border:none; cursor:pointer; border-radius:5px; }
+.btn-start, .btn-end { background-color:#001f4d; color:#fff; }
+.btn-break, .btn-return, .btn-out, .btn-back { background-color:#fff; color:#001f4d; border:2px solid #001f4d; }
+.info-section { padding:10px; }
+.memo-input { width:100%; height:50px; margin-bottom:10px; }
+.summary-card { background:#e6e6e6; padding:10px; border-radius:5px; margin-bottom:10px; }
+.summary-grid { display:grid; grid-template-columns: repeat(4,1fr); gap:5px; margin-top:5px; }
+.summary-field { background:#fff; padding:5px; text-align:center; border-radius:3px; }
+.timebar-card { background:#fff; padding:10px; border-radius:5px; }
+.timebar-container { height:20px; background:#c0c0c0; border-radius:10px; position:relative; margin-top:5px; }
+.timebar-fill { height:100%; background:#001f4d; border-radius:10px 0 0 10px; width:0%; transition: width 0.5s; }
+.chart-card { margin:10px; padding:10px; background:#fff; border-radius:5px; }
+.footer-bar { background:#d9d9d9; padding:5px; text-align:center; }
+#toast { position:fixed; bottom:20px; left:50%; transform:translateX(-50%); background:#000;color:#fff;padding:5px 10px;border-radius:5px; display:none; }
 </style>
 </head>
 <body>
 
 <div class="header-top">
-<div class="header-company" id="companyName">アビームコンサルティング株式会社</div>
-<div class="header-employee" id="employeeInfo">宮嵜 凌 / 社員番号:964255</div>
+  <div class="header-company" id="companyName">株式会社サンプル</div>
+  <div class="header-employee" id="employeeInfo">山田 太郎 / 社員番号:12345</div>
 </div>
+
 <div class="header-bottom">
-<div class="header-clock" id="digitalClock">--:--<span class="sec">--</span></div>
-<div class="header-date" id="dateDisplay">----/--/-- (---)</div>
-<div class="header-last">
-<span id="lastStamp">直前の打刻：[勤務開始] ----/-- --:--</span>
-<button onclick="cancelLast()">打刻取消</button>
-</div>
+  <div class="header-clock" id="digitalClock">--:--<span class="sec">--</span></div>
+  <div class="header-date" id="dateDisplay">----/--/-- (---)</div>
+  <div class="header-last">
+    <span id="lastStamp">直前の打刻：[勤務開始] ----/-- --:--</span>
+    <button onclick="cancelLast()">打刻取消</button>
+  </div>
 </div>
 
 <div class="button-grid">
-<button class="action-btn btn-start" onclick="confirmPost('勤務開始')">勤務開始</button>
-<button class="action-btn btn-end" onclick="confirmPost('勤務終了')">勤務終了</button>
-<button class="action-btn btn-break" onclick="confirmPost('休憩開始')">休憩開始</button>
-<button class="action-btn btn-return" onclick="confirmPost('休憩終了')">休憩終了</button>
-<button class="action-btn btn-out" onclick="confirmPost('外出')">外出</button>
-<button class="action-btn btn-back" onclick="confirmPost('戻り')">戻り</button>
+  <button class="action-btn btn-start" onclick="confirmPost('勤務開始')">勤務開始</button>
+  <button class="action-btn btn-end" onclick="confirmPost('勤務終了')">勤務終了</button>
+  <button class="action-btn btn-break" onclick="confirmPost('休憩開始')">休憩開始</button>
+  <button class="action-btn btn-return" onclick="confirmPost('休憩終了')">休憩終了</button>
+  <button class="action-btn btn-out" onclick="confirmPost('外出')">外出</button>
+  <button class="action-btn btn-back" onclick="confirmPost('戻り')">戻り</button>
 </div>
 
 <div class="info-section">
-<textarea class="memo-input" placeholder="メモを記入してください"></textarea>
-<div class="summary-card">
-<div class="summary-title">タイムカード入力</div>
-<div class="summary-grid">
-<div class="summary-field" id="planned">出勤予定：--:-- - --:--<br>所定時間数：--:--</div>
-<div class="summary-field" id="startTime">開始時刻：--:--</div>
-<div class="summary-field" id="endTime">終了時刻：--:--</div>
-<div class="summary-field" id="breakTime">休憩時間数：--:--</div>
-<div class="summary-field" id="workTime">勤務時間数：--:--</div>
-</div>
-</div>
+  <textarea class="memo-input" placeholder="メモを記入してください"></textarea>
+  <div class="summary-card">
+    <div class="summary-title">タイムカード入力</div>
+    <div class="summary-grid">
+      <div class="summary-field" id="planned">出勤予定：--:-- - --:--<br>所定時間数：--:--</div>
+      <div class="summary-field" id="startTime">開始時刻：--:--</div>
+      <div class="summary-field" id="endTime">終了時刻：--:--</div>
+      <div class="summary-field" id="breakTime">休憩時間数：--:--</div>
+      <div class="summary-field" id="workTime">勤務時間数：--:--</div>
+    </div>
+  </div>
 
-<div class="timebar-card">
-<div class="timebar-title">勤務時間の可視化</div>
-<div class="timebar-container" id="timeBar"></div>
-</div>
+  <div class="timebar-card">
+    <div class="timebar-title">勤務時間の可視化</div>
+    <div class="timebar-container"><div class="timebar-fill" id="timeBar"></div></div>
+  </div>
 </div>
 
 <div class="chart-card">
-<div id="chart_div"></div>
+  <div id="chart_div"></div>
 </div>
 
 <div id="toast"></div>
 <div class="footer-bar" id="footerStatus">勤務 0h | 残業 0h | 外出 0h</div>
-<div id="tooltip" class="tooltip"></div>
 
 <script>
-const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbxdNZRHjy5tpb9tVzWStCxQcMR1Z7FygyOPR4bB1lV5UFffRBXAB9-zhw1vwzLnqZbnYw/exec';
-
-// --- 連打防止用ロック ---
+// ---------- JS ----------
+const WEBAPP_URL = '【ここにGASのWebアプリURLを入れる】';
 let lock = false;
-
-// 打刻ボタン用：確認ダイアログ + 連打防止
-function confirmPost(type){
-if(lock) return;
-if(!confirm(`${type}を打刻しますか？`)) return;
-
-lock = true;
-fetch(WEBAPP_URL, { method:'POST', body: JSON.stringify({type:type}) })
-.then(r=>r.json())
-.then(d=>{
-showToast(d.status + (d.message? ': '+d.message:''));
-loadStatus();
-})
-.catch(()=>showToast('通信エラー'))
-.finally(()=>{ setTimeout(()=>{ lock=false; }, 2000); });
-}
-
-// 打刻取消
-function cancelLast(){
-fetch(WEBAPP_URL+'?type=cancel',{ method:'POST' })
-.then(r=>r.json())
-.then(d=>{ showToast(d.status); loadStatus(); })
-.catch(()=>showToast('通信エラー'));
-}
 
 // デジタル時計
 function updateDateTime(){
-const now=new Date();
-const year=now.getFullYear();
-const month=(now.getMonth()+1).toString().padStart(2,'0');
-const day=now.getDate().toString().padStart(2,'0');
-const weekdays=['日','月','火','水','木','金','土'];
-const weekday=weekdays[now.getDay()];
-document.getElementById('dateDisplay').innerText=`${year}/${month}/${day} (${weekday})`;
-
-const h=now.getHours().toString().padStart(2,'0');
-const m=now.getMinutes().toString().padStart(2,'0');
-const s=now.getSeconds().toString().padStart(2,'0');
-document.getElementById('digitalClock').innerHTML=`${h}:${m}<span class="sec">${s}</span>`;
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = (now.getMonth()+1).toString().padStart(2,'0');
+  const day = now.getDate().toString().padStart(2,'0');
+  const weekdays = ['日','月','火','水','木','金','土'];
+  const weekday = weekdays[now.getDay()];
+  document.getElementById('dateDisplay').innerText = `${year}/${month}/${day} (${weekday})`;
+  const h = now.getHours().toString().padStart(2,'0');
+  const m = now.getMinutes().toString().padStart(2,'0');
+  const s = now.getSeconds().toString().padStart(2,'0');
+  document.getElementById('digitalClock').innerHTML = `${h}:${m}<span class="sec">${s}</span>`;
 }
 setInterval(updateDateTime,1000);
 updateDateTime();
 
-// --- 残りのJS: loadStatus(), drawTimeBar(), drawChart(), showToast() は既存のフェーズ2コードをそのまま ---
+// Toast表示
+function showToast(msg){
+  const t = document.getElementById('toast');
+  t.innerText = msg; t.style.display='block';
+  setTimeout(()=>{t.style.display='none'},2000);
+}
+
+// 打刻処理
+function confirmPost(type){
+  if(lock) return;
+  if(!confirm(`${type}を打刻しますか？`)) return;
+  lock = true;
+  const memo = document.querySelector('.memo-input').value;
+  fetch(WEBAPP_URL, {
+    method:'POST',
+    body: JSON.stringify({type:type, memo:memo})
+  })
+  .then(r=>r.json())
+  .then(d=>{ showToast(d.status+(d.message?': '+d.message:'')); loadStatus(); })
+  .catch(()=>showToast('通信エラー'))
+  .finally(()=>{ setTimeout(()=>{ lock=false; },2000); });
+}
+
+// 打刻取消
+function cancelLast(){
+  fetch(WEBAPP_URL+'?type=cancel',{ method:'POST' })
+  .then(r=>r.json())
+  .then(d=>{ showToast(d.status); loadStatus(); })
+  .catch(()=>showToast('通信エラー'));
+}
+
+// ダミー：loadStatus（ここにGASからデータ取得して表示更新）
+function loadStatus(){
+  // ここで打刻ログ取得して表示や時間バー更新
+  document.getElementById('planned').innerText = "出勤予定：09:00-18:00\n所定時間数：08:00";
+  document.getElementById('startTime').innerText = "開始時刻：10:00";
+  document.getElementById('endTime').innerText = "終了時刻：18:00";
+  document.getElementById('breakTime').innerText = "休憩時間数：01:00";
+  document.getElementById('workTime').innerText = "勤務時間数：07:00";
+  document.getElementById('timeBar').style.width = "87%";
+}
+loadStatus();
 </script>
 </body>
 </html>
